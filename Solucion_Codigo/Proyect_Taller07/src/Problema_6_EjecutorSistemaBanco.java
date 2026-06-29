@@ -16,238 +16,153 @@
 * otros dos tipos anteriores de cuentas bancarias, ésta tiene el interés del 
 * 10%, sin cargos ni castigos por sobregiro.
  * @author Joel Cabrera
- * @version 1.0
+ * @version 2.0
  */
 class Cuenta {
 
-    public String numCuenta;
-    public String nomCliente;
-    public double balance;
+    private int numeroCuenta;
+    private String nombreCliente;
+    private double balanceActual;
 
-    public Cuenta(String numCuenta, String nomCliente) {
-        this.numCuenta = numCuenta;
-        this.nomCliente = nomCliente;
-        this.balance = 0.0;
+    public Cuenta(int numeroCuenta, String nombreCliente) {
+        this.numeroCuenta = numeroCuenta;
+        this.nombreCliente = nombreCliente;
     }
 
-    public void depositar(double cantidad) {
-        balance += cantidad;
-        System.out.println("Deposito de " + cantidad + " realizado. Balance actual: " + balance);
+    public int getNumeroCuenta() {
+        return numeroCuenta;
     }
 
-    public void retirar(double cantidad) {
-        balance -= cantidad;
-        System.out.println("Retiro de " + cantidad + " realizado. Balance actual: " + balance);
+    public String getNombreCliente() {
+        return nombreCliente;
     }
 
     public double getBalanceActual() {
-        return balance;
+        return balanceActual;
+    }
+
+    public void setBalanceActual(double balanceActual) {
+        this.balanceActual = balanceActual;
+    }
+
+    public void depositar(double monto) {
+        this.balanceActual += monto;
+    }
+
+    public void retirarDinero(double monto) {
+        if (monto > 0 && monto <= balanceActual) {
+            this.balanceActual -= monto;
+        }
     }
 
     @Override
     public String toString() {
-        return "Cuenta: " + numCuenta
-                + "\nCliente: " + nomCliente
-                + "\nBalance: " + balance;
+        return "Cuenta{" + "numeroCuenta=" + numeroCuenta + ", nombreCliente=" + nombreCliente + ", balanceActual=" + balanceActual + '}';
     }
+
 }
 
-class Cheques extends Cuenta {
+class Cheque extends Cuenta {
 
-    public boolean sob;
+    private double sobregiro;
 
-    public Cheques(String numCuenta, String nomCliente, double balance, boolean sob) {
-        super(numCuenta, nomCliente);
-        this.balance = balance;
-        this.sob = sob;
+    public Cheque(double sobregiro, int numeroCuenta, String nombreCliente) {
+        super(numeroCuenta, nombreCliente);
+        this.sobregiro = sobregiro;
+    }
+
+    public double getSobregiro() {
+        return sobregiro;
     }
 
     @Override
-    public void retirar(double cantidad) {
-        if (!sob && balance - cantidad < 0) {
-            System.out.println("Error");
-            return;
+    public void retirarDinero(double monto) {
+        if (monto > 0 && (getBalanceActual() - monto) >= -sobregiro) {
+            setBalanceActual(getBalanceActual() - monto);
         }
-        balance -= cantidad;
-        System.out.println("Retiro de " + cantidad + " realizado, ahora tiene " + balance);
     }
 
     @Override
     public String toString() {
-        return "Cuenta Cheques\n" + super.toString() + "\nPermite sobregiro: " + sob;
+        return super.toString() + " Cheque{" + "sobregiro=" + sobregiro + '}';
     }
+
 }
 
 class Ahorro extends Cuenta {
 
-    public double intAhorro;
+    private double interes;
 
-    public Ahorro(String numCuenta, String nomCliente, double balance, double intAhorro) {
-        super(numCuenta, nomCliente);
-        this.balance = balance;
-        this.intAhorro = intAhorro;
+    public Ahorro(double interes, int numeroCuenta, String nombreCliente) {
+        super(numeroCuenta, nombreCliente);
+        this.interes = interes;
     }
 
-    @Override
-    public void retirar(double cantidad) {
-        if (balance - cantidad < 0) {
-            System.out.println("Error: Cuenta de ahorros no puede tener balance negativo.");
-            return;
-        }
-        balance -= cantidad;
-        System.out.println("Retiro de " + cantidad + " realizado. Balance actual: " + balance);
-    }
-
-    public double calcularInteres() {
-        if (balance > 0) {
-            double intGanado = balance * intAhorro;
-            balance += intGanado;
-            System.out.println("Interes calculado: " + intGanado + " - Nuevo balance: " + balance);
-            return intGanado;
-        }
-        System.out.println("Interes calculado: 0.0 - Nuevo balance: " + balance);
-        return 0.0;
+    public void calcularInteres() {
+        double aux;
+        aux = (this.getBalanceActual() * (this.interes / 100));
+        setBalanceActual(this.getBalanceActual() + aux);
     }
 
     @Override
     public String toString() {
-        return "Cuenta Ahorros\n" + super.toString() + "\nTasa de interes: " + intAhorro;
+        return super.toString() + " Ahorro{" + "interes=" + interes + '}';
     }
+
 }
 
 class Platino extends Cuenta {
 
-    public double intPlatino = 0.10;
+    private double interes = 10;
 
-    public Platino(String numCuenta, String nomCliente, double balance) {
-        super(numCuenta, nomCliente);
-        this.balance = balance;
+    public Platino(int numeroCuenta, String nombreCliente) {
+        super(numeroCuenta, nombreCliente);
+    }
+
+    public void calcularInteres() {
+        double aux;
+        aux = (this.getBalanceActual() * (this.interes / 100));
+        setBalanceActual(getBalanceActual() + aux);
     }
 
     @Override
-    public void retirar(double cantidad) {
-        balance -= cantidad;
-        System.out.println("Retiro de " + cantidad + " realizado. Balance actual: " + balance);
-    }
-
-    public double calcularInteres() {
-        if (balance > 0) {
-            double intGanado = balance * intPlatino;
-            balance += intGanado;
-            System.out.println("Interes Platino: " + intGanado + " - Nuevo balance: " + balance);
-            return intGanado;
+    public void retirarDinero(double monto) {
+        if (monto > 0) {
+            setBalanceActual(getBalanceActual() - monto);
         }
-        System.out.println("Interes Platino: 0.0 - Nuevo balance: " + balance);
-        return 0.0;
     }
 
     @Override
     public String toString() {
-        return "Cuenta Platino\n" + super.toString() + "\nTasa de interes: " + intPlatino;
+        return super.toString() + " Platino{" + "interes=" + interes + '}';
     }
+
 }
 
 public class Problema_6_EjecutorSistemaBanco {
 
     public static void main(String[] args) {
-        Cheques cheque1 = new Cheques("1234", "Maria Sofia", 1000.0, true);
-        Ahorro ah1 = new Ahorro("5627", "Juan Velasco", 200.0, 0.10);
-        Platino p1 = new Platino("8907", "Guillermo Guajala", 1600.0);
+        Cheque cheque = new Cheque(500, 1, "Joel");
+        cheque.depositar(1000);
+        cheque.retirarDinero(400);
+        System.out.println(cheque);
 
-        System.out.println("Estado Inicial");
-        System.out.println();
-        System.out.println(cheque1);
-        System.out.println();
-        System.out.println(ah1);
-        System.out.println();
-        System.out.println(p1);
-        System.out.println();
+        Ahorro ahorro = new Ahorro(20, 2, "Luis");
+        ahorro.depositar(1000);
+        ahorro.calcularInteres();
+        ahorro.retirarDinero(500);
+        System.out.println(ahorro);
 
-        System.out.println("Operaciones");
-        System.out.println();
+        Platino platino = new Platino(3, "Camilo");
+        platino.depositar(1000);
+        platino.retirarDinero(600);
+        System.out.println(platino);
 
-        System.out.println("Prueba Cheques");
-        cheque1.depositar(200.0);
-        cheque1.retirar(800.0);
-        System.out.println();
-
-        System.out.println("Prueba Ahorros");
-        ah1.depositar(500.0);
-        ah1.retirar(2000.0);
-        ah1.calcularInteres();
-        System.out.println();
-
-        System.out.println("Prueba Platino");
-        p1.depositar(1000.0);
-        p1.retirar(4000.0);
-        p1.calcularInteres();
-        System.out.println();
-
-        System.out.println("Estado Final");
-        System.out.println();
-        System.out.println(cheque1);
-        System.out.println();
-        System.out.println(ah1);
-        System.out.println();
-        System.out.println(p1);
     }
 }
 /**
- * run:
-Estado Inicial
-
-Cuenta Cheques
-Cuenta: 1234
-Cliente: Maria Sofia
-Balance: 1000.0
-Permite sobregiro: true
-
-Cuenta Ahorros
-Cuenta: 5627
-Cliente: Juan Velasco
-Balance: 200.0
-Tasa de interes: 0.1
-
-Cuenta Platino
-Cuenta: 8907
-Cliente: Guillermo Guajala
-Balance: 1600.0
-Tasa de interes: 0.1
-
-Operaciones
-
-Prueba Cheques
-Deposito de 200.0 realizado. Balance actual: 1200.0
-Retiro de 800.0 realizado, ahora tiene 400.0
-
-Prueba Ahorros
-Deposito de 500.0 realizado. Balance actual: 700.0
-Error: Cuenta de ahorros no puede tener balance negativo.
-Interes calculado: 70.0 - Nuevo balance: 770.0
-
-Prueba Platino
-Deposito de 1000.0 realizado. Balance actual: 2600.0
-Retiro de 4000.0 realizado. Balance actual: -1400.0
-Interes Platino: 0.0 - Nuevo balance: -1400.0
-
-Estado Final
-
-Cuenta Cheques
-Cuenta: 1234
-Cliente: Maria Sofia
-Balance: 400.0
-Permite sobregiro: true
-
-Cuenta Ahorros
-Cuenta: 5627
-Cliente: Juan Velasco
-Balance: 770.0
-Tasa de interes: 0.1
-
-Cuenta Platino
-Cuenta: 8907
-Cliente: Guillermo Guajala
-Balance: -1400.0
-Tasa de interes: 0.1
+ * Cuenta{numeroCuenta=1, nombreCliente=Joel, balanceActual=600.0} Cheque{sobregiro=500.0}
+Cuenta{numeroCuenta=2, nombreCliente=Luis, balanceActual=700.0} Ahorro{interes=20.0}
+Cuenta{numeroCuenta=3, nombreCliente=Camilo, balanceActual=400.0} Platino{interes=10.0}
 BUILD SUCCESSFUL (total time: 0 seconds)
  */

@@ -91,11 +91,11 @@ public class Problema_2_EjecutorVideoClub {
         String[] idiomasDvd = {"Espanol", "Ingles"};
         Pelicula peli = new Pelicula("Spiderman", "MikeTowers", 2026);
         
-        Dvd dvd1 = new Dvd(4.7, idiomasDvd, peli, 2, 10.0);
+        Dvd dvd1 = new Dvd(4.7, idiomasDvd, peli, 2, 10);
         dvd1.calcularCostoAlquiler();
         System.out.println(dvd1);
         
-        Vhs vhs1 = new Vhs("Cromo", "Español", peli, 2, 10.0);
+        Vhs vhs1 = new Vhs("Cromo", "Español", peli, 2, 10          );
         vhs1.calcularCostoAlquiler();
         System.out.println(vhs1);
     }
